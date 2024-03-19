@@ -26,7 +26,7 @@
 
     <div class="ui active tab" data-tab="clubbudgetform">
         <div class="ui vertical segment">
-            <form method="Post" id="club_budget_form" enctype="multipart/form-data">
+            <form method="Post"  action ="{% url 'gymkhana:club_budget' %}",id="club_budget_form" enctype="multipart/form-data">
             {%csrf_token %}
                 {% comment %}The add a new skill Accordian starts here!{% endcomment %}
                 <div class="ui form" style="padding: 8px; padding-left: 24px; padding-right: 24px;">
@@ -36,7 +36,9 @@
                         <select class="ui search fluid dropdown" name="club" required>
                             <option value="">Select</option>
                             {% for i in Club_name %}
+                               {% if i.status ==  "confirmed" %}
                                     <option value="{{ i.club_name }}">{{ i.club_name }} </option>
+                               {% endif %}  
                             {% endfor %}
                         </select>
                     </div>
@@ -64,7 +66,7 @@
                     </div>
 
                     <div class="field">
-                        <button class="ui primary button right floated" type="submit" onclick="form_submit('club_budget','club_budget_form',event)">
+                        <button class="ui primary button right floated" type="submit">
                             Submit
                         </button>
                     </div>

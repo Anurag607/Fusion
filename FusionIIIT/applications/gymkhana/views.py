@@ -945,8 +945,8 @@ def club_budget(request):
 		budget_file.name = club+"_budget"
 		club_name = get_object_or_404(Club_info, club_name=club)
 
-		club_budget = Club_budget(club=club_name, budget_amt=budget_amount,
-								  budget_file=budget_file, budget_for=budget_for, description=description)
+		club_budget = Club_budget(club_id=club_name, budget_amt=budget_amount,
+								  budget_file=budget_file, budget_for=budget_for, description=description,status="open")
 		club_budget.save()
 		messages.success(request, "Successfully requested for the budget !!!")
 
@@ -1623,7 +1623,7 @@ def vote(request,poll_id):
 
 @login_required
 def delete_poll(request, poll_id):
-	"""
+    """
 		delete_poll:
 		This view delete the particular voting poll which is passed through function and redirect
 		to "/gymkhana/" if there is an exception then it return the HttpResponse of "error" 
@@ -1633,17 +1633,68 @@ def delete_poll(request, poll_id):
 		@variables:
 			poll : It is an object stores the all data of poll_id  from Voting_poll
 	"""
-	try:
-		poll = Voting_polls.objects.filter(pk=poll_id)
-		poll.delete()
-		return redirect('/gymkhana/')
-	except Exception as e:
-			logger.info(e)
-			return HttpResponse('error')
+    try:
+        poll = Voting_polls.objects.filter(pk=poll_id)
+        poll.delete()
+        return redirect('/gymkhana/')
+    except Exception as e:
+        logger.info(e)
+        return HttpResponse('error')
 
-	return redirect('/gymkhana/')
+    return redirect('/gymkhana/')
+
 
 # this algorithm checks if the passed slot time coflicts with any of already booked events
+@login_required
+def budget_approve(request):
+    """
+    This view is used by the administration to approve the clubs_budget.
+    It gets a list of clubs and then approves_budget if they want to.
+
+    @variables:
+              club_approve_list - list of clubs which has to be approved
+              club_name - gets the object and then confirms the club
+    """
+    if request.method == "POST":
+        budget_approve_list = request.POST.getlist("check")
+        for club_id in budget_approve_list:
+            club_budget = get_object_or_404(
+                Club_budget, club_id=club_id, status="open"
+            )  # Ensure status is open
+            club_budget.status = "confirmed"
+            club_budget.save()  # Save the changes
+            club_info = get_object_or_404(Club_info, club_id=club_id)
+            club_info.avail_budget += club_budget.budget_amt  # Add the budget amount
+            club_info.save()  # Save the changes
+            messages.success(
+                request, f"Successfully budget approved for {club_budget.club_id} club."
+            )
+    return redirect("/gymkhana/")
+
+
+@login_required
+def budget_reject(request):
+    """
+    This view is used by the administration to reject the clubs.
+        It gets a list of clubs and then rejects if they want to.
+
+        @variables:
+                  club_reject_list - list of clubs which has to be checked and rejected
+                          club_name - gets the object and then rejects the club
+
+    """
+    if request.method == "POST":
+       budget_approve_list = request.POST.getlist("check")
+       for club in budget_approve_list:
+            club_budget = get_object_or_404(Club_budget, club_name=club)
+            club_budget.status = "rejected"
+            club_budget.save()
+            messages.success(
+                request, f"Successfully  budget rejection for {club_budget.club_name} club."
+            )
+
+    return redirect("/gymkhana/")
+
 
 def conflict_algorithm_event(date, start_time, end_time, venue):
 	"""

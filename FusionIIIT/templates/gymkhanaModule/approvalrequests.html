@@ -3,10 +3,9 @@
 
     {% comment %}The tab menu starts here!{% endcomment %}
     <div class="ui pointing secondary menu">
-        <!-- <a class="item" data-tab="clubbudget">
+        <<a class="item" data-tab="clubbudget">
             Club Budget
-        </a> -->
-
+        </a> 
         <a class="active item" data-tab="newclub">
             New Club Formation
         </a>
@@ -14,6 +13,8 @@
 
     <div class="ui tab" data-tab="clubbudget">
         <div class="ui vertical segment">
+            <form method="POST"  id="budget_action_formr">
+                 {% csrf_token %}
             <table class="ui very basic collapsing celled sortable table"
                    style="padding-left: 2.5%;
                                                           padding-right: 2.5%;
@@ -53,7 +54,7 @@
                         <tr>
                             <td class="collapsing">
                                 <div class="ui fitted checkbox">
-                                    <input type="checkbox"  id="{{ i.club }} {{ i.budget_for }}" name="{{ i.club }} {{ i.budget_for }}" > <label></label>
+                                    <input type="checkbox"  id="{{ i.club }} {{ i.budget_for }}" value="{{ i.club_id }}" name="{{ i.club }} {{ i.budget_for }}" > <label></label>
                                 </div>
                             </td>
                             <td>
@@ -93,12 +94,19 @@
 
             <br>
 
-            <div class="ui primary right floated button">Approve Selected</div>
-            <div class="ui red right floated button">Reject Selected</div>
-
+            <div class="field">
+                <button class="ui primary button right floated" type="submit" id= formaction="/gymkhana/budget_approve/">
+                    Approve Selected
+                </button>
+            </div>
+            <div class="field">
+                <button class="ui red button right floated" type="submit" formaction="/gymkhana/budget_reject/">
+                    Reject Selected
+                </button>
+            </div>
             <br>
             <br>
-
+        </form>
             <div class="ui divider"></div>
 
         </div>
@@ -106,7 +114,7 @@
 
     <div class="ui active tab" data-tab="newclub">
         <div class="ui vertical segment">
-        <form method="post" action="" id="clubrequest">
+        <form method="POST"  id="club_action_form">
         {% csrf_token %}
             <table class="ui very basic collapsing celled sortable table"
                    style="padding-top: 1%;
@@ -132,9 +140,9 @@
                     <th class="four wide column">
                         Faculty Incharge
                     </th>
-{#                    <th class="one wide column">#}
-{#                        PFA#}
-{#                    </th>#}
+                    <th class="one wide column">
+                       PFA
+                    </th>
                 </tr>
                 </thead>
 
@@ -245,6 +253,19 @@
 
         document.getElementById("reject_button").addEventListener("click", function() {
             handleButtonClick("/gymkhana/club_reject/");
+        });
+        function handleButtonClick(action) {
+            document.getElementById("budget_action_form").action = action;
+            document.getElementById("budget_action_form").submit();
+        }
+
+        // Add event listeners to buttons
+        document.getElementById("budget_approve").addEventListener("click", function() {
+            handleButtonClick("/gymkhana/budget_approve/");
+        });
+
+        document.getElementById("budget_regect").addEventListener("click", function() {
+            handleButtonClick("/gymkhana/budget_reject/");
         });
     </script>
 {% endblock %}
