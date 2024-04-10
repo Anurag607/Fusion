@@ -127,15 +127,15 @@
                     <th>File</th>
                 </thead>
                 <tbody>
-                    {% for budget in club_budgets %}
-                    {% if budget.club.club_name == selected_club %}
-                    <tr class="clubname-{{ budget.club.club_name }}" hidden>
+                    {% for budget in Club_budget %}
+                    {% comment %} {% if budget.club_id == selected_club %} {% endcomment %}
+                    <tr class="clubname-{{ budget.club_id }}" hidden>
                         <td>{{ budget.budget_for }}</td>
                         <td>{{ budget.budget_amt }}</td>
                         <td>{{ budget.description }}</td>
                         <td><a href="{{ budget.budget_file.url }}">Download File</a></td>
                     </tr>
-                    {% endif %}
+                    {% comment %} {% endif %} {% endcomment %}
                     {% endfor %}
                 </tbody>
             </table>
